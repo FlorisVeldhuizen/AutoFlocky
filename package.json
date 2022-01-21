@@ -1,0 +1,18 @@
+{
+  "name": "AutoFlocky",
+  "source": "src/index.html",
+  "license": "MIT",
+  "scripts": {
+    "start": "parcel ./src/index.html",
+    "build": "parcel build ./src/index.html --public-url ./"
+  },
+  "devDependencies": {
+    "parcel": "^2.2.1",
+    "eslint": "^7.2.0",
+    "eslint-config-airbnb-base": "14.2.1",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-prettier": "^4.0.0",
+    "parcel": "^2.0.0-rc.0",
+    "prettier": "2.4.0"
+  }
+}
