@@ -3,6 +3,12 @@ import logoImg from './assets/logo.png';
 import skyImg from './assets/sky.png';
 import starImg from './assets/star.png';
 
+// Tutorial:
+// https://phaser.io/tutorials/making-your-first-phaser-3-game/part3
+
+// Plan:
+// https://docs.google.com/document/d/1-YIxIrBr3ptBb-FJzd6LaSc6j1txRjKX7bbwcFTI-JA/edit
+
 function preload ()
 {
   this.load.image('logo', logoImg);
