@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import logoImg from './assets/logo.png';
 import skyImg from './assets/sky.png';
 import starImg from './assets/star.png';
+import './index.css';
 
 function preload ()
 {
