@@ -91,7 +91,7 @@ function create() {
   stars = this.physics.add.group({
     key: "star",
     repeat: 11,
-    setXY: { x: 12, y: 0, stepX: 70 },
+    setXY: { x: 12, y: 0, stepY: 70 },
   });
 
   stars.children.iterate(function (child) {
@@ -104,6 +104,7 @@ function create() {
   // PHYSICS
   this.physics.add.collider(player, platforms);
   this.physics.add.collider(stars, platforms);
+  this.physics.add.collider(stars, stars);
   this.physics.add.overlap(player, stars, collectStar, null, this);
   this.physics.add.collider(bombs, platforms);
   this.physics.add.collider(player, bombs, hitBomb, null, this);
