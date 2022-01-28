@@ -12,7 +12,6 @@ import "./index.css";
 // Plan:
 // https://docs.google.com/document/d/1-YIxIrBr3ptBb-FJzd6LaSc6j1txRjKX7bbwcFTI-JA/edit
 
-
 const config = {
   type: Phaser.AUTO,
   width: 800,
@@ -20,7 +19,7 @@ const config = {
   physics: {
     default: "arcade",
     arcade: {
-      gravity: { y: 300 },
+      gravity: { x: 0, y: 0 },
       debug: false,
     },
   },
@@ -61,10 +60,10 @@ function create() {
   platforms.create(750, 220, "ground");
 
   // PLAYER
-  player = this.physics.add.sprite(100, 450, "dude");
+  player = this.physics.add.sprite(400, 300, "dude");
 
   player.setBounce(0.2);
-  player.body.setGravityY(300);
+  // player.body.setGravityY(300);
   player.setCollideWorldBounds(true);
 
   this.anims.create({
@@ -143,7 +142,6 @@ function hitBomb(player, bomb) {
   this.physics.pause();
 
   player.setTint(0xff0000);
-
   player.anims.play("turn");
 
   gameOver = true;
@@ -158,8 +156,17 @@ function update() {
     player.setVelocityX(160);
 
     player.anims.play("right", true);
+  } else if (cursors.up.isDown) {
+    player.setVelocityY(-160);
+
+    player.anims.play("up", true);
+  } else if (cursors.down.isDown) {
+    player.setVelocityY(160);
+
+    player.anims.play("turn", true);
   } else {
     player.setVelocityX(0);
+    player.setVelocityY(0);
 
     player.anims.play("turn");
   }
