@@ -148,6 +148,12 @@ function hitBomb(player, bomb) {
   gameOver = true;
 }
 
+function enemyFollows(physics) {
+  stars.children.each(star => {
+    physics.moveToObject(star, player, 100);
+  })
+}
+
 function update() {
   if (cursors.left.isDown) {
     player.setVelocityX(-160);
@@ -175,4 +181,6 @@ function update() {
   if (cursors.up.isDown && player.body.touching.down) {
     player.setVelocityY(-500);
   }
+
+  enemyFollows(this.physics);
 }
