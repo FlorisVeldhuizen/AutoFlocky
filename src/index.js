@@ -1,11 +1,17 @@
 import Phaser from "phaser";
-import logoImg from "./assets/logo.png";
 import skyImg from "./assets/sky.png";
 import starImg from "./assets/star.png";
 import platformImg from "./assets/platform.png";
 import bombImg from "./assets/bomb.png";
 import dudeImg from "./assets/dude.png";
 import "./index.css";
+
+// Tutorial:
+// https://phaser.io/tutorials/making-your-first-phaser-3-game/part3
+
+// Plan:
+// https://docs.google.com/document/d/1-YIxIrBr3ptBb-FJzd6LaSc6j1txRjKX7bbwcFTI-JA/edit
+
 
 const config = {
   type: Phaser.AUTO,
@@ -35,9 +41,12 @@ function preload() {
   this.load.spritesheet("dude", dudeImg, { frameWidth: 32, frameHeight: 48 });
 }
 
-var platforms;
-var score = 0;
-var scoreText;
+let platforms;
+let score = 0;
+let scoreText;
+let player;
+let stars;
+let cursors;
 
 function create() {
   // BACKGROUND
