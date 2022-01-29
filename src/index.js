@@ -24,6 +24,7 @@ const config = {
     },
   },
   scene: {
+    // constructor: constructor,
     preload: preload,
     create: create,
     update: update,
@@ -31,6 +32,10 @@ const config = {
 };
 
 const game = new Phaser.Game(config);
+
+// function () {
+
+// }
 
 function preload() {
   this.load.image("sky", skyImg);
@@ -49,7 +54,7 @@ let cursors;
 
 function create() {
   // BACKGROUND
-  this.add.image(400, 300, "sky");
+  this.add.image(0, 0, "sky").setOrigin(0);
 
   // PLATFORMS
   platforms = this.physics.add.staticGroup();
@@ -108,6 +113,10 @@ function create() {
   this.physics.add.collider(bombs, platforms);
   this.physics.add.collider(player, bombs, hitBomb, null, this);
 
+  // CAMERA
+  this.cameras.main.setSize(800, 600);
+  this.cameras.main.startFollow(player);
+
   // OTHER
   cursors = this.input.keyboard.createCursorKeys();
   scoreText = this.add.text(16, 16, "score: 0", {
@@ -149,9 +158,9 @@ function hitBomb(player, bomb) {
 }
 
 function enemyFollows(physics) {
-  stars.children.each(star => {
+  stars.children.each((star) => {
     physics.moveToObject(star, player, 100);
-  })
+  });
 }
 
 function update() {
@@ -166,7 +175,7 @@ function update() {
   } else if (cursors.up.isDown) {
     player.setVelocityY(-160);
 
-    player.anims.play("up", true);
+    player.anims.play("turn", true);
   } else if (cursors.down.isDown) {
     player.setVelocityY(160);
 
