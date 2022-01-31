@@ -48,6 +48,9 @@ let player;
 let stars;
 let cursors;
 
+// CONSTANTS
+const accelerationSpeed = 20;
+
 function create() {
   // BACKGROUND
   this.add.image(0, 0, "sky").setOrigin(0);
@@ -62,9 +65,10 @@ function create() {
 
   // PLAYER
   player = this.physics.add.sprite(400, 300, "dude");
-
   player.setBounce(0.1);
-  player.setDrag(500);
+  player.setDamping(true);
+  player.setDrag(0.01);
+  player.setMaxVelocity(160);
   player.setCollideWorldBounds(true);
 
   this.anims.create({
@@ -164,19 +168,19 @@ function update() {
   const directionalBlock = cursors.left.isDown && cursors.right.isDown || cursors.down.isDown && cursors.up.isDown;
   if (!directionalBlock) {
     if (cursors.left.isDown) {
-      player.setVelocityX(-160);
+      player.setVelocityX(player.body.velocity.x - accelerationSpeed);
       player.anims.play("left", true);
     };
     if (cursors.right.isDown) {
-      player.setVelocityX(160);
+      player.setVelocityX(player.body.velocity.x + accelerationSpeed);
       player.anims.play("right", true);
     };
     if (cursors.up.isDown) {
-      player.setVelocityY(-160);
+      player.setVelocityY(player.body.velocity.y - accelerationSpeed);
       player.anims.play("turn", true);
     };
     if (cursors.down.isDown) {
-      player.setVelocityY(160);
+      player.setVelocityY(player.body.velocity.y + accelerationSpeed);
       player.anims.play("turn", true);
     }
   }
