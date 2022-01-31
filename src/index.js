@@ -49,7 +49,7 @@ let stars;
 let cursors;
 
 // CONSTANTS
-const accelerationSpeed = 20;
+const accelerationSpeed = 2000;
 
 function create() {
   // BACKGROUND
@@ -94,8 +94,8 @@ function create() {
   // STARS
   stars = this.physics.add.group({
     key: "star",
-    repeat: 11,
-    setXY: { x: 12, y: 0, stepY: 70 },
+    repeat: 50,
+    setXY: { x: 0, y: 12, stepX: 20 },
   });
 
   stars.children.iterate(function (child) {
@@ -133,7 +133,7 @@ function collectStar(player, star) {
 
   if (stars.countActive(true) === 0) {
     stars.children.iterate(function (child) {
-      child.enableBody(true, child.x, 0, true, true);
+      child.enableBody(true, Phaser.Math.Between(0,  600), 0, true, true);
     });
 
     var x =
@@ -141,10 +141,15 @@ function collectStar(player, star) {
         ? Phaser.Math.Between(400, 800)
         : Phaser.Math.Between(0, 400);
 
-    var bomb = bombs.create(x, 16, "bomb");
+    const y =
+      player.y < 200
+        ? Phaser.Math.Between(200, 400)
+        : Phaser.Math.Between(0, 200);
+
+    var bomb = bombs.create(x, y, "bomb");
     bomb.setBounce(1);
     bomb.setCollideWorldBounds(true);
-    bomb.setVelocity(Phaser.Math.Between(-200, 200), 20);
+    bomb.setVelocity(Phaser.Math.Between(-300, 300), 100);
   }
 }
 
