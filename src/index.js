@@ -166,23 +166,24 @@ function enemyFollows(physics) {
 function update() {
   const nothingHappens = cursors.left.isUp && cursors.right.isUp && cursors.down.isUp && cursors.up.isUp;
   const directionalBlock = cursors.left.isDown && cursors.right.isDown || cursors.down.isDown && cursors.up.isDown;
+  player.setAcceleration(0);
   if (!directionalBlock) {
     if (cursors.left.isDown) {
-      player.setVelocityX(player.body.velocity.x - accelerationSpeed);
+      player.setAccelerationX(-accelerationSpeed);
       player.anims.play("left", true);
     };
     if (cursors.right.isDown) {
-      player.setVelocityX(player.body.velocity.x + accelerationSpeed);
+      player.setAccelerationX(accelerationSpeed);
       player.anims.play("right", true);
     };
     if (cursors.up.isDown) {
-      player.setVelocityY(player.body.velocity.y - accelerationSpeed);
+      player.setAccelerationY(-accelerationSpeed);
       player.anims.play("turn", true);
     };
     if (cursors.down.isDown) {
-      player.setVelocityY(player.body.velocity.y + accelerationSpeed);
+      player.setAccelerationY(accelerationSpeed);
       player.anims.play("turn", true);
-    }
+    };
   }
   if (nothingHappens || directionalBlock) {
     player.anims.play("turn");
