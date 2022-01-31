@@ -24,7 +24,6 @@ const config = {
     },
   },
   scene: {
-    // constructor: constructor,
     preload: preload,
     create: create,
     update: update,
@@ -33,9 +32,6 @@ const config = {
 
 const game = new Phaser.Game(config);
 
-// function () {
-
-// }
 
 function preload() {
   this.load.image("sky", skyImg);
@@ -67,8 +63,8 @@ function create() {
   // PLAYER
   player = this.physics.add.sprite(400, 300, "dude");
 
-  player.setBounce(0.2);
-  // player.body.setGravityY(300);
+  player.setBounce(0.1);
+  player.setDrag(500);
   player.setCollideWorldBounds(true);
 
   this.anims.create({
@@ -164,32 +160,28 @@ function enemyFollows(physics) {
 }
 
 function update() {
-  if (cursors.left.isDown) {
-    player.setVelocityX(-160);
-
-    player.anims.play("left", true);
-  } else if (cursors.right.isDown) {
-    player.setVelocityX(160);
-
-    player.anims.play("right", true);
-  } else if (cursors.up.isDown) {
-    player.setVelocityY(-160);
-
-    player.anims.play("turn", true);
-  } else if (cursors.down.isDown) {
-    player.setVelocityY(160);
-
-    player.anims.play("turn", true);
-  } else {
-    player.setVelocityX(0);
-    player.setVelocityY(0);
-
+  const nothingHappens = cursors.left.isUp && cursors.right.isUp && cursors.down.isUp && cursors.up.isUp;
+  const directionalBlock = cursors.left.isDown && cursors.right.isDown || cursors.down.isDown && cursors.up.isDown;
+  if (!directionalBlock) {
+    if (cursors.left.isDown) {
+      player.setVelocityX(-160);
+      player.anims.play("left", true);
+    };
+    if (cursors.right.isDown) {
+      player.setVelocityX(160);
+      player.anims.play("right", true);
+    };
+    if (cursors.up.isDown) {
+      player.setVelocityY(-160);
+      player.anims.play("turn", true);
+    };
+    if (cursors.down.isDown) {
+      player.setVelocityY(160);
+      player.anims.play("turn", true);
+    }
+  }
+  if (nothingHappens || directionalBlock) {
     player.anims.play("turn");
   }
-
-  if (cursors.up.isDown && player.body.touching.down) {
-    player.setVelocityY(-500);
-  }
-
   enemyFollows(this.physics);
 }
