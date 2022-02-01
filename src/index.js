@@ -48,6 +48,11 @@ let stars;
 let cursors;
 let wasd;
 
+let up;
+let down;
+let left;
+let right;
+
 // CONSTANTS
 const accelerationSpeed = 75;
 const maxVelocity = 200;
@@ -176,37 +181,42 @@ function enemyFollows(physics) {
   });
 }
 
-function update() {
-  const nothingHappens = cursors.left.isUp && cursors.right.isUp && cursors.down.isUp && cursors.up.isUp;
-  const directionalBlock = cursors.left.isDown && cursors.right.isDown || cursors.down.isDown && cursors.up.isDown;
+const movement = () => {
+  const nothingHappens = !(left || right || up || down);
+  const directionalBlock = (left && right) || (down && up);
 
   if (!directionalBlock) {
-    if (cursors.left.isDown) {
+    if (left) {
       player.setVelocityX(player.body.velocity.x - accelerationSpeed);
       player.anims.play("left", true);
     };
-    if (cursors.right.isDown) {
+    if (right) {
       player.setVelocityX(player.body.velocity.x + accelerationSpeed);
       player.anims.play("right", true);
     };
-    if (cursors.up.isDown) {
+    if (up) {
       player.setVelocityY(player.body.velocity.y - accelerationSpeed);
       player.anims.play("turn", true);
     };
-    if (cursors.down.isDown) {
+    if (down) {
       player.setVelocityY(player.body.velocity.y + accelerationSpeed);
       player.anims.play("turn", true);
     };
-
-    const velocityVector = Math.sqrt( Math.pow(player.body.velocity.x,2) + Math.pow(player.body.velocity.y,2));
-    if (velocityVector > maxVelocity) {
+    if (player.body.velocity.length() > maxVelocity) {
       player.body.velocity.normalize().scale(maxVelocity);
     }
   }
-
   if (nothingHappens || directionalBlock) {
     player.anims.play("turn");
   }
+}
+
+function update() {
+  cursors.left.isDown || wasd.left.isDown ? left = true : left = false;
+  cursors.right.isDown || wasd.right.isDown ? right = true : right = false;
+  cursors.up.isDown || wasd.up.isDown ? up = true : up = false;
+  cursors.down.isDown || wasd.down.isDown ? down = true : down = false;
+  movement();
 
   enemyFollows(this.physics);
 }
