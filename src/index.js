@@ -32,7 +32,6 @@ const config = {
 
 const game = new Phaser.Game(config);
 
-
 function preload() {
   this.load.image("sky", skyImg);
   this.load.image("ground", platformImg);
@@ -47,9 +46,11 @@ let scoreText;
 let player;
 let stars;
 let cursors;
+let wasd;
 
 // CONSTANTS
-const accelerationSpeed = 2000;
+const accelerationSpeed = 75;
+const maxVelocity = 200;
 
 function create() {
   // BACKGROUND
@@ -68,7 +69,7 @@ function create() {
   player.setBounce(0.1);
   player.setDamping(true);
   player.setDrag(0.01);
-  player.setMaxVelocity(160);
+  player.setMaxVelocity(maxVelocity);
   player.setCollideWorldBounds(true);
 
   this.anims.create({
@@ -94,8 +95,8 @@ function create() {
   // STARS
   stars = this.physics.add.group({
     key: "star",
-    repeat: 50,
-    setXY: { x: 0, y: 12, stepX: 20 },
+    repeat: 30,
+    setXY: { x: 0, y: 12, stepX: 28 },
   });
 
   stars.children.iterate(function (child) {
@@ -119,6 +120,13 @@ function create() {
 
   // OTHER
   cursors = this.input.keyboard.createCursorKeys();
+  wasd = this.input.keyboard.addKeys({
+    up:Phaser.Input.Keyboard.KeyCodes.W,
+    down:Phaser.Input.Keyboard.KeyCodes.S,
+    left:Phaser.Input.Keyboard.KeyCodes.A,
+    right:Phaser.Input.Keyboard.KeyCodes.D
+  });
+
   scoreText = this.add.text(16, 16, "score: 0", {
     fontSize: "32px",
     fill: "#000",
@@ -133,7 +141,7 @@ function collectStar(player, star) {
 
   if (stars.countActive(true) === 0) {
     stars.children.iterate(function (child) {
-      child.enableBody(true, Phaser.Math.Between(0,  600), 0, true, true);
+      child.enableBody(true, Phaser.Math.Between(0,  800), 0, true, true);
     });
 
     var x =
@@ -171,27 +179,34 @@ function enemyFollows(physics) {
 function update() {
   const nothingHappens = cursors.left.isUp && cursors.right.isUp && cursors.down.isUp && cursors.up.isUp;
   const directionalBlock = cursors.left.isDown && cursors.right.isDown || cursors.down.isDown && cursors.up.isDown;
-  player.setAcceleration(0);
+
   if (!directionalBlock) {
     if (cursors.left.isDown) {
-      player.setAccelerationX(-accelerationSpeed);
+      player.setVelocityX(player.body.velocity.x - accelerationSpeed);
       player.anims.play("left", true);
     };
     if (cursors.right.isDown) {
-      player.setAccelerationX(accelerationSpeed);
+      player.setVelocityX(player.body.velocity.x + accelerationSpeed);
       player.anims.play("right", true);
     };
     if (cursors.up.isDown) {
-      player.setAccelerationY(-accelerationSpeed);
+      player.setVelocityY(player.body.velocity.y - accelerationSpeed);
       player.anims.play("turn", true);
     };
     if (cursors.down.isDown) {
-      player.setAccelerationY(accelerationSpeed);
+      player.setVelocityY(player.body.velocity.y + accelerationSpeed);
       player.anims.play("turn", true);
     };
+
+    const velocityVector = Math.sqrt( Math.pow(player.body.velocity.x,2) + Math.pow(player.body.velocity.y,2));
+    if (velocityVector > maxVelocity) {
+      player.body.velocity.normalize().scale(maxVelocity);
+    }
   }
+
   if (nothingHappens || directionalBlock) {
     player.anims.play("turn");
   }
+
   enemyFollows(this.physics);
 }
