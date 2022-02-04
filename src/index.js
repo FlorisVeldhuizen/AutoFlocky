@@ -4,6 +4,7 @@ import starImg from "./assets/star.png";
 import platformImg from "./assets/platform.png";
 import bombImg from "./assets/bomb.png";
 import dudeImg from "./assets/dude.png";
+import bulletImg from "./assets/bullet.png";
 import "./index.css";
 
 // Tutorial:
@@ -37,6 +38,7 @@ function preload() {
   this.load.image("ground", platformImg);
   this.load.image("star", starImg);
   this.load.image("bomb", bombImg);
+  this.load.image("bullet", bulletImg, 10, 10);
   this.load.spritesheet("dude", dudeImg, { frameWidth: 32, frameHeight: 48 });
 }
 
@@ -123,13 +125,19 @@ function create() {
   this.cameras.main.setSize(800, 600);
   this.cameras.main.startFollow(player);
 
+  // BULLETS
+  playerBullets = this.physics.add.group({
+    classType: Bullet,
+    runChildUpdate: true,
+  });
+
   // OTHER
   cursors = this.input.keyboard.createCursorKeys();
   wasd = this.input.keyboard.addKeys({
-    up:Phaser.Input.Keyboard.KeyCodes.W,
-    down:Phaser.Input.Keyboard.KeyCodes.S,
-    left:Phaser.Input.Keyboard.KeyCodes.A,
-    right:Phaser.Input.Keyboard.KeyCodes.D
+    up: Phaser.Input.Keyboard.KeyCodes.W,
+    down: Phaser.Input.Keyboard.KeyCodes.S,
+    left: Phaser.Input.Keyboard.KeyCodes.A,
+    right: Phaser.Input.Keyboard.KeyCodes.D,
   });
 
   scoreText = this.add.text(16, 16, "score: 0", {
@@ -146,7 +154,7 @@ function collectStar(player, star) {
 
   if (stars.countActive(true) === 0) {
     stars.children.iterate(function (child) {
-      child.enableBody(true, Phaser.Math.Between(0,  800), 0, true, true);
+      child.enableBody(true, Phaser.Math.Between(0, 800), 0, true, true);
     });
 
     var x =
@@ -189,19 +197,19 @@ const movement = () => {
     if (left) {
       player.setVelocityX(player.body.velocity.x - accelerationSpeed);
       player.anims.play("left", true);
-    };
+    }
     if (right) {
       player.setVelocityX(player.body.velocity.x + accelerationSpeed);
       player.anims.play("right", true);
-    };
+    }
     if (up) {
       player.setVelocityY(player.body.velocity.y - accelerationSpeed);
       player.anims.play("turn", true);
-    };
+    }
     if (down) {
       player.setVelocityY(player.body.velocity.y + accelerationSpeed);
       player.anims.play("turn", true);
-    };
+    }
     if (player.body.velocity.length() > maxVelocity) {
       player.body.velocity.normalize().scale(maxVelocity);
     }
@@ -209,14 +217,88 @@ const movement = () => {
   if (nothingHappens || directionalBlock) {
     player.anims.play("turn");
   }
-}
+};
 
 function update() {
-  cursors.left.isDown || wasd.left.isDown ? left = true : left = false;
-  cursors.right.isDown || wasd.right.isDown ? right = true : right = false;
-  cursors.up.isDown || wasd.up.isDown ? up = true : up = false;
-  cursors.down.isDown || wasd.down.isDown ? down = true : down = false;
+  cursors.left.isDown || wasd.left.isDown ? (left = true) : (left = false);
+  cursors.right.isDown || wasd.right.isDown ? (right = true) : (right = false);
+  cursors.up.isDown || wasd.up.isDown ? (up = true) : (up = false);
+  cursors.down.isDown || wasd.down.isDown ? (down = true) : (down = false);
   movement();
+
+  if (left || right || up || down) {
+    //player.active
+    // console.log(playerBullets.children.entries.length);
+
+    if (playerBullets.children.entries.length == 0) {
+      // Get bullet from bullets group
+      var bullet = playerBullets.get().setActive(true).setVisible(true);
+
+      if (bullet) {
+        // closest = stars.closest(player);
+        closest = this.physics.closest(player);
+        console.log(closest);
+        bullet.fire(player, closest);
+
+        this.physics.add.collider(closest, bullet, starHitCallback);
+      }
+    }
+  }
 
   enemyFollows(this.physics);
 }
+
+function starHitCallback(enemyHit, bulletHit) {
+  // Reduce health of enemy
+  if (bulletHit.active === true && enemyHit.active === true) {
+    // enemyHit.setActive(false).setVisible(false);
+    bulletHit.setActive(false).setVisible(false);
+    console.log(enemyHit);
+    collectStar(player, enemyHit);
+  }
+}
+
+const Bullet = new Phaser.Class({
+  Extends: Phaser.GameObjects.Image,
+
+  initialize:
+    // Bullet Constructor
+    function Bullet(scene) {
+      Phaser.GameObjects.Image.call(this, scene, 0, 0, "bullet");
+      this.speed = 1;
+      this.born = 0;
+      this.direction = 0;
+      this.xSpeed = 0;
+      this.ySpeed = 0;
+      this.setSize(12, 12, true);
+    },
+
+  // Fires a bullet from the player to the reticle
+  fire: function (shooter, target) {
+    this.setPosition(shooter.x, shooter.y); // Initial position
+    this.direction = Math.atan((target.x - this.x) / (target.y - this.y));
+
+    // Calculate X and y velocity of bullet to moves it from shooter to target
+    if (target.y >= this.y) {
+      this.xSpeed = this.speed * Math.sin(this.direction);
+      this.ySpeed = this.speed * Math.cos(this.direction);
+    } else {
+      this.xSpeed = -this.speed * Math.sin(this.direction);
+      this.ySpeed = -this.speed * Math.cos(this.direction);
+    }
+
+    this.rotation = shooter.rotation; // angle bullet with shooters rotation
+    this.born = 0; // Time since new bullet spawned
+  },
+
+  // Updates the position of the bullet each cycle
+  update: function (time, delta) {
+    this.x += this.xSpeed * delta;
+    this.y += this.ySpeed * delta;
+    this.born += delta;
+    if (this.born > 1800) {
+      this.setActive(false);
+      this.setVisible(false);
+    }
+  },
+});
