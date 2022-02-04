@@ -24,6 +24,10 @@ const config = {
       debug: false,
     },
   },
+  fps: {
+    target: 30,
+    forceSetTimeOut: true
+  },
   scene: {
     preload: preload,
     create: create,
