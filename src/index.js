@@ -5,6 +5,7 @@ import platformImg from "./assets/platform.png";
 import bombImg from "./assets/bomb.png";
 import dudeImg from "./assets/dude.png";
 import bulletImg from "./assets/bullet.png";
+import diamondImg from "./assets/diamond.png"
 import "./index.css";
 
 // Tutorial:
@@ -25,7 +26,7 @@ const config = {
     },
   },
   fps: {
-    target: 30,
+    target: 60,
     forceSetTimeOut: true
   },
   scene: {
@@ -42,6 +43,7 @@ function preload() {
   this.load.image("ground", platformImg);
   this.load.image("star", starImg);
   this.load.image("bomb", bombImg);
+  this.load.image("diamond", diamondImg);
   this.load.image("bullet", bulletImg, 10, 10);
   this.load.spritesheet("dude", dudeImg, { frameWidth: 32, frameHeight: 48 });
 }
@@ -114,8 +116,9 @@ function create() {
     child.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8));
   });
 
-  // BOMBS
+  // GAME ITEMS
   bombs = this.physics.add.group();
+  diamonds = this.physics.add.group();
 
   // PHYSICS
   this.physics.add.collider(player, platforms);
@@ -134,6 +137,8 @@ function create() {
     classType: Bullet,
     runChildUpdate: true,
   });
+
+  this.physics.add.overlap(playerBullets, stars, starHitCallback, null, this);
 
   // OTHER
   cursors = this.input.keyboard.createCursorKeys();
@@ -176,6 +181,11 @@ function collectStar(player, star) {
     bomb.setCollideWorldBounds(true);
     bomb.setVelocity(Phaser.Math.Between(-300, 300), 100);
   }
+}
+
+function enemyDrops(enemy) {
+  enemy.disableBody(true, true);
+
 }
 
 function hitBomb(player, bomb) {
@@ -231,6 +241,7 @@ function update() {
   movement();
 
   if (left || right || up || down) {
+    console.log(this.physics);
     //player.active
     // console.log(playerBullets.children.entries.length);
 
@@ -241,10 +252,7 @@ function update() {
       if (bullet) {
         // closest = stars.closest(player);
         closest = this.physics.closest(player);
-        console.log(closest);
         bullet.fire(player, closest);
-
-        this.physics.add.collider(closest, bullet, starHitCallback);
       }
     }
   }
@@ -253,12 +261,15 @@ function update() {
 }
 
 function starHitCallback(enemyHit, bulletHit) {
+  console.log(enemyHit, bulletHit);
   // Reduce health of enemy
   if (bulletHit.active === true && enemyHit.active === true) {
     // enemyHit.setActive(false).setVisible(false);
+    const { x, y } = bulletHit;
     bulletHit.setActive(false).setVisible(false);
-    console.log(enemyHit);
-    collectStar(player, enemyHit);
+    // enemyHit
+    diamonds.create(x,y,"diamond");
+    // collectStar(player, enemyHit);
   }
 }
 
