@@ -29,10 +29,12 @@ class GameScene extends Phaser.Scene {
     this.diamonds;
     this.playerBullets;
 
-    this.up;
-    this.down;
-    this.left;
-    this.right;
+    this.keys = {
+      up: false,
+      down: false,
+      left: false,
+      right: false
+    }
   }
 
   init() {}
@@ -43,7 +45,7 @@ class GameScene extends Phaser.Scene {
     this.load.image("star", starImg);
     this.load.image("bomb", bombImg);
     this.load.image("diamond", diamondImg);
-    this.load.image("bullet", bulletImg, 10, 10);
+    this.load.image("bullet", bulletImg);
     this.load.spritesheet("dude", dudeImg, { frameWidth: 32, frameHeight: 48 });
     this.load.image("flocky", flockyImg);
   }
@@ -129,11 +131,13 @@ class GameScene extends Phaser.Scene {
       this
     );
 
+    this.physics.add.collider(this.playerBullets, this.platforms);
+
     // AUTO SHOOT
     this.scene.time.addEvent({
       delay: 500,
       callback: this.shoot,
-      args: [this.physics, this.playerBullets, this.player],
+      args: [],
       callbackScope: this.scene,
       loop: true,
     });
@@ -155,19 +159,19 @@ class GameScene extends Phaser.Scene {
 
   update() {
     this.cursors.left.isDown || this.wasd.left.isDown
-      ? (this.left = true)
-      : (this.left = false);
+      ? (this.keys.left = true)
+      : (this.keys.left = false);
     this.cursors.right.isDown || this.wasd.right.isDown
-      ? (this.right = true)
-      : (this.right = false);
+      ? (this.keys.right = true)
+      : (this.keys.right = false);
     this.cursors.up.isDown || this.wasd.up.isDown
-      ? (this.up = true)
-      : (this.up = false);
+      ? (this.keys.up = true)
+      : (this.keys.up = false);
     this.cursors.down.isDown || this.wasd.down.isDown
-      ? (this.down = true)
-      : (this.down = false);
+      ? (this.keys.down = true)
+      : (this.keys.down = false);
     this.animateFlockys();
-    this.player.update(this.left, this.right, this.up, this.down);
+    this.player.update(this.keys);
     this.enemyFollows(this.physics);
   }
 
@@ -218,13 +222,13 @@ class GameScene extends Phaser.Scene {
     gameOver = true;
   }
 
-  enemyFollows(physics) {
+  enemyFollows() {
     this.stars.children.each((star) => {
       this.physics.moveToObject(star, this.player, 100);
     });
   }
 
-  shoot(physics, playerBullets, player) {
+  shoot() {
     if (this.playerBullets.countActive(true) === 0) {
       // Get bullet from bullets group
       var bullet = this.playerBullets.get().setActive(true).setVisible(true);

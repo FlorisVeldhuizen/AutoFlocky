@@ -18,7 +18,7 @@ class Player extends Phaser.GameObjects.Sprite {
     this.body.setMaxVelocity(maxVelocity);
     this.body.setCollideWorldBounds(true);
   }
-  update(left, right, up, down) {
+  update({ left, right, up, down }) {
     const nothingHappens = !(left || right || up || down);
     const directionalBlock = (left && right) || (down && up);
 
