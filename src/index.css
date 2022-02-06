@@ -1,4 +1,22 @@
+:root {
+  --gray: #393939;
+}
+
+* {
+  font-family: "Times New Roman", serif;
+}
+
 canvas {
-  display : block;
-  margin : auto;
+  display: block;
+  margin: auto;
+}
+
+#game-title {
+  color: white;
+  justify-content: center;
+  text-align: center;
+}
+
+body {
+  background-color: var(--gray);
 }

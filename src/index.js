@@ -10,7 +10,7 @@ import platformImg from "./assets/platform.png";
 import bombImg from "./assets/bomb.png";
 import dudeImg from "./assets/dude.png";
 import bulletImg from "./assets/bullet.png";
-import diamondImg from "./assets/diamond.png"
+import diamondImg from "./assets/diamond.png";
 import flockyImg from "./assets/flocky.png";
 
 // Tutorial:
@@ -32,7 +32,7 @@ const config = {
   },
   fps: {
     target: 60,
-    forceSetTimeOut: true
+    forceSetTimeOut: true,
   },
   scene: {
     preload: preload,
@@ -139,7 +139,7 @@ function create() {
     delay: 500,
     callback: shoot,
     args: [this.physics],
-    loop: true
+    loop: true,
   });
 
   // OTHER
@@ -272,11 +272,11 @@ function update() {
 function starHitCallback(enemyHit, bulletHit) {
   // Reduce health of enemy
   if (bulletHit.active === true && enemyHit.active === true) {
-    enemyHit.health = enemyHit.health -1;
+    enemyHit.health = enemyHit.health - 1;
     flashColor(enemyHit, 0xff0000);
-    if(enemyHit.health <= 0) {
+    if (enemyHit.health <= 0) {
       const { x, y } = enemyHit;
-      diamonds.create(x,y,"diamond");
+      diamonds.create(x, y, "diamond");
       enemyHit.setActive(false).setVisible(false);
     }
   }
@@ -286,7 +286,9 @@ const flashColor = (object, color) => {
   object.setTint(color);
   scene.time.addEvent({
     delay: 100,
-    callback: function(){ object.clearTint(); },
+    callback: function () {
+      object.clearTint();
+    },
     callbackScope: this,
   });
 }
