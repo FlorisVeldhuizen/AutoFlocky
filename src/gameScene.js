@@ -9,10 +9,7 @@ import diamondImg from "./assets/diamond.png";
 import flockyImg from "./assets/flocky.png";
 import makeAnimations from "./helpers/animations";
 import Bullet from "./sprites/Bullet";
-
-// CONSTANTS
-const accelerationSpeed = 75;
-const maxVelocity = 200;
+import Player from "./sprites/Player";
 
 class GameScene extends Phaser.Scene {
   constructor() {
@@ -62,15 +59,10 @@ class GameScene extends Phaser.Scene {
     this.platforms.create(750, 220, "ground");
 
     //SCENE
-    this.scene = this.scene.scene;
+    this.scene = this;
 
     // PLAYER
-    this.player = this.physics.add.sprite(400, 300, "dude");
-    this.player.setBounce(0.1);
-    this.player.setDamping(true);
-    this.player.setDrag(0.01);
-    this.player.setMaxVelocity(maxVelocity);
-    this.player.setCollideWorldBounds(true);
+    this.player = new Player(this);
 
     makeAnimations(this);
 
@@ -172,9 +164,8 @@ class GameScene extends Phaser.Scene {
     this.cursors.down.isDown || this.wasd.down.isDown
       ? (this.down = true)
       : (this.down = false);
-    this.movement();
     this.animateFlockys();
-
+    this.player.update(this.left, this.right, this.up, this.down);
     this.enemyFollows(this.physics);
   }
 
@@ -229,45 +220,6 @@ class GameScene extends Phaser.Scene {
     this.stars.children.each((star) => {
       this.physics.moveToObject(star, this.player, 100);
     });
-  }
-
-  movement() {
-    const nothingHappens = !(this.left || this.right || this.up || this.down);
-    const directionalBlock =
-      (this.left && this.right) || (this.down && this.up);
-
-    if (!directionalBlock) {
-      if (this.left) {
-        this.player.setVelocityX(
-          this.player.body.velocity.x - accelerationSpeed
-        );
-        this.player.anims.play("left", true);
-      }
-      if (this.right) {
-        this.player.setVelocityX(
-          this.player.body.velocity.x + accelerationSpeed
-        );
-        this.player.anims.play("right", true);
-      }
-      if (this.up) {
-        this.player.setVelocityY(
-          this.player.body.velocity.y - accelerationSpeed
-        );
-        this.player.anims.play("turn", true);
-      }
-      if (this.down) {
-        this.player.setVelocityY(
-          this.player.body.velocity.y + accelerationSpeed
-        );
-        this.player.anims.play("turn", true);
-      }
-      if (this.player.body.velocity.length() > maxVelocity) {
-        this.player.body.velocity.normalize().scale(maxVelocity);
-      }
-    }
-    if (nothingHappens || directionalBlock) {
-      this.player.anims.play("turn");
-    }
   }
 
   shoot(physics, playerBullets, player) {
