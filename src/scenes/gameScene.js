@@ -22,7 +22,7 @@ class GameScene extends Phaser.Scene {
     this.score = 0;
     this.scoreText;
     this.player;
-    this.stars;
+    this.enemies;
     this.cursors;
     this.wasd;
     this.bombs;
@@ -71,14 +71,13 @@ class GameScene extends Phaser.Scene {
     makeAnimations(this);
 
     // STARS
-    this.stars = this.physics.add.group({
+    this.enemies = this.physics.add.group({
       key: "flocky",
       repeat: 30,
       setXY: { x: 0, y: 12, stepX: 28 },
     });
 
-    this.stars.children.iterate(function (child) {
-      child.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8));
+    this.enemies.children.iterate(function (child) {
       child.health = 20;
     });
 
@@ -88,11 +87,11 @@ class GameScene extends Phaser.Scene {
 
     // PHYSICS
     this.physics.add.collider(this.player, this.platforms);
-    this.physics.add.collider(this.stars, this.platforms);
-    this.physics.add.collider(this.stars, this.stars);
+    this.physics.add.collider(this.enemies, this.platforms);
+    this.physics.add.collider(this.enemies, this.enemies);
     this.physics.add.overlap(
       this.player,
-      this.stars,
+      this.enemies,
       this.collectStar,
       null,
       this
@@ -124,7 +123,7 @@ class GameScene extends Phaser.Scene {
     });
 
     this.physics.add.overlap(
-      this.stars,
+      this.enemies,
       this.playerBullets,
       this.starHitCallback,
       null,
@@ -184,8 +183,8 @@ class GameScene extends Phaser.Scene {
     this.score += 10;
     this.scoreText.setText("Score: " + this.score);
 
-    if (this.stars.countActive(true) === 0) {
-      this.stars.children.iterate(function (child) {
+    if (this.enemies.countActive(true) === 0) {
+      this.enemies.children.iterate(function (child) {
         child.enableBody(true, Phaser.Math.Between(0, 800), 0, true, true);
         child.health = 20;
       });
@@ -223,7 +222,7 @@ class GameScene extends Phaser.Scene {
   }
 
   enemyFollows() {
-    this.stars.children.each((star) => {
+    this.enemies.children.each((star) => {
       this.physics.moveToObject(star, this.player, 100);
     });
   }
@@ -233,15 +232,24 @@ class GameScene extends Phaser.Scene {
       // Get bullet from bullets group
       var bullet = this.playerBullets.get().setActive(true).setVisible(true);
       if (bullet) {
-        const closest = this.physics.closest(this.player);
-        bullet.fire(this.player, closest);
+        const player = this.player;
+        let closestEnemy;
+        let closestEnemyDist = 10000;
+        this.enemies.children.iterate(function (child) {
+          const dist = Phaser.Math.Distance.BetweenPoints(player, child);
+          if (dist < closestEnemyDist) {
+            closestEnemyDist = dist;
+            closestEnemy = child;
+          }
+        });
+        bullet.fire(this.player, closestEnemy);
       }
     }
   }
 
   animateFlockys() {
     const playerX = this.player.x;
-    this.stars.children.iterate(function (child) {
+    this.enemies.children.iterate(function (child) {
       if (child.body.position.x > playerX) {
         child.setFlipX(false);
       } else {
