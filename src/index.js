@@ -1,7 +1,7 @@
+import Phaser from "phaser";
 import TitleScene from "./titleScene.js";
 import GameScene from "./gameScene.js";
 import "./index.css";
-import Phaser from "phaser";
 
 // Our game scene
 const gameScene = new GameScene();
