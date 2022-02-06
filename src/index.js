@@ -49,6 +49,7 @@ function preload() {
 }
 
 let platforms;
+let scene;
 let score = 0;
 let scoreText;
 let player;
@@ -76,6 +77,9 @@ function create() {
   platforms.create(600, 400, "ground");
   platforms.create(50, 250, "ground");
   platforms.create(750, 220, "ground");
+
+  //SCENE
+  scene = this.scene.scene;
 
   // PLAYER
   player = this.physics.add.sprite(400, 300, "dude");
@@ -114,6 +118,7 @@ function create() {
 
   stars.children.iterate(function (child) {
     child.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8));
+    child.health = 20;
   });
 
   // GAME ITEMS
@@ -125,6 +130,7 @@ function create() {
   this.physics.add.collider(stars, platforms);
   this.physics.add.collider(stars, stars);
   this.physics.add.overlap(player, stars, collectStar, null, this);
+  this.physics.add.overlap(player, diamonds, collectDiamond, null, this);
   this.physics.add.collider(bombs, platforms);
   this.physics.add.collider(player, bombs, hitBomb, null, this);
 
@@ -138,7 +144,15 @@ function create() {
     runChildUpdate: true,
   });
 
-  this.physics.add.overlap(playerBullets, stars, starHitCallback, null, this);
+  this.physics.add.overlap(stars, playerBullets, starHitCallback, null, this);
+
+  // AUTO SHOOT
+  scene.time.addEvent({
+    delay: 500,
+    callback: shoot,
+    args: [this.physics],
+    loop: true
+  });
 
   // OTHER
   cursors = this.input.keyboard.createCursorKeys();
@@ -164,6 +178,7 @@ function collectStar(player, star) {
   if (stars.countActive(true) === 0) {
     stars.children.iterate(function (child) {
       child.enableBody(true, Phaser.Math.Between(0, 800), 0, true, true);
+      child.health = 20;
     });
 
     var x =
@@ -181,6 +196,12 @@ function collectStar(player, star) {
     bomb.setCollideWorldBounds(true);
     bomb.setVelocity(Phaser.Math.Between(-300, 300), 100);
   }
+}
+
+function collectDiamond(player, diamond) {
+  diamond.disableBody(true, true);
+  score += 50;
+  scoreText.setText("Score: " + score);
 }
 
 function enemyDrops(enemy) {
@@ -233,6 +254,17 @@ const movement = () => {
   }
 };
 
+function shoot(physics) {
+  if (playerBullets.countActive(true) === 0) {
+    // Get bullet from bullets group
+    var bullet = playerBullets.get().setActive(true).setVisible(true);
+    if (bullet) {
+      closest = physics.closest(player);
+      bullet.fire(player, closest);
+    }
+  }
+}
+
 function update() {
   cursors.left.isDown || wasd.left.isDown ? (left = true) : (left = false);
   cursors.right.isDown || wasd.right.isDown ? (right = true) : (right = false);
@@ -240,37 +272,29 @@ function update() {
   cursors.down.isDown || wasd.down.isDown ? (down = true) : (down = false);
   movement();
 
-  if (left || right || up || down) {
-    console.log(this.physics);
-    //player.active
-    // console.log(playerBullets.children.entries.length);
-
-    if (playerBullets.children.entries.length == 0) {
-      // Get bullet from bullets group
-      var bullet = playerBullets.get().setActive(true).setVisible(true);
-
-      if (bullet) {
-        // closest = stars.closest(player);
-        closest = this.physics.closest(player);
-        bullet.fire(player, closest);
-      }
-    }
-  }
-
   enemyFollows(this.physics);
 }
 
 function starHitCallback(enemyHit, bulletHit) {
-  console.log(enemyHit, bulletHit);
   // Reduce health of enemy
   if (bulletHit.active === true && enemyHit.active === true) {
-    // enemyHit.setActive(false).setVisible(false);
-    const { x, y } = bulletHit;
-    bulletHit.setActive(false).setVisible(false);
-    // enemyHit
-    diamonds.create(x,y,"diamond");
-    // collectStar(player, enemyHit);
+    enemyHit.health = enemyHit.health -1;
+    flashColor(enemyHit, 0xff0000);
+    if(enemyHit.health <= 0) {
+      const { x, y } = enemyHit;
+      diamonds.create(x,y,"diamond");
+      enemyHit.setActive(false).setVisible(false);
+    }
   }
+}
+
+const flashColor = (object, color) => {
+  object.setTint(color);
+  scene.time.addEvent({
+    delay: 100,
+    callback: function(){ object.clearTint(); },
+    callbackScope: this,
+  });
 }
 
 const Bullet = new Phaser.Class({
