@@ -1,15 +1,17 @@
 import Phaser from "phaser";
-import skyImg from "./assets/sky.png";
-import starImg from "./assets/star.png";
-import platformImg from "./assets/platform.png";
-import bombImg from "./assets/bomb.png";
-import dudeImg from "./assets/dude.png";
-import bulletImg from "./assets/bullet.png";
-import diamondImg from "./assets/diamond.png";
-import flockyImg from "./assets/flocky.png";
-import makeAnimations from "./helpers/animations";
-import Bullet from "./sprites/Bullet";
-import Player from "./sprites/Player";
+import makeAnimations from "../helpers/animations";
+import Bullet from "../sprites/Bullet";
+import Player from "../sprites/Player";
+
+// IMPORT ASSETS
+import skyImg from "../assets/sky.png";
+import starImg from "../assets/star.png";
+import platformImg from "../assets/platform.png";
+import bombImg from "../assets/bomb.png";
+import dudeImg from "../assets/dude.png";
+import bulletImg from "../assets/bullet.png";
+import diamondImg from "../assets/diamond.png";
+import flockyImg from "../assets/flocky.png";
 
 class GameScene extends Phaser.Scene {
   constructor() {

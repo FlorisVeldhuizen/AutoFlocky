@@ -1,6 +1,6 @@
 import Phaser from "phaser";
-import TitleScene from "./titleScene.js";
-import GameScene from "./gameScene.js";
+import TitleScene from "./scenes/titleScene";
+import GameScene from "./scenes/gameScene";
 import "./index.css";
 
 // Our game scene
