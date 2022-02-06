@@ -1,56 +1,52 @@
 import Phaser from "phaser";
 
-const Player = new Phaser.Class({
-  Extends: Phaser.GameObjects.Image,
+// CONSTANTS
+const accelerationSpeed = 75;
+const maxVelocity = 200;
+class Player extends Phaser.GameObjects.Sprite {
+  constructor(scene) {
+    super(scene, 300, 400, "dude");
 
-  initialize:
-    // Bullet Constructor
-    function Player(scene) {
-      // Phaser.GameObjects.Image.call(this, scene, 0, 0, "bullet");
-      // this.speed = 1;
-      // this.born = 0;
-      // this.direction = 0;
-      // this.xSpeed = 0;
-      // this.ySpeed = 0;
-      // this.setSize(12, 12, true);
+    this.scene.add.existing(this);
+    this.scene.physics.add.existing(this);
 
-      Phaser.GameObjects.Image.call(this, scene, 400, 300, "dude");
-      // scene.physics.add.sprite(400, 300, "dude");
-      this.setBounce(0.1);
-      this.setDamping(true);
-      this.setDrag(0.01);
-      this.setMaxVelocity(maxVelocity);
-      this.setCollideWorldBounds(true);
-    },
+    this.body.onOverlap = true;
 
-  // Fires a bullet from the player to the reticle
-  // fire: function (shooter, target) {
-  //   this.setPosition(shooter.x, shooter.y); // Initial position
-  //   this.direction = Math.atan((target.x - this.x) / (target.y - this.y));
+    this.body.setBounce(0.1);
+    this.body.setDamping(true);
+    this.body.setDrag(0.01);
+    this.body.setMaxVelocity(maxVelocity);
+    this.body.setCollideWorldBounds(true);
+  }
+  update(left, right, up, down) {
+    const nothingHappens = !(left || right || up || down);
+    const directionalBlock = (left && right) || (down && up);
 
-  //   // Calculate X and y velocity of bullet to moves it from shooter to target
-  //   if (target.y >= this.y) {
-  //     this.xSpeed = this.speed * Math.sin(this.direction);
-  //     this.ySpeed = this.speed * Math.cos(this.direction);
-  //   } else {
-  //     this.xSpeed = -this.speed * Math.sin(this.direction);
-  //     this.ySpeed = -this.speed * Math.cos(this.direction);
-  //   }
-
-  //   this.rotation = shooter.rotation; // angle bullet with shooters rotation
-  //   this.born = 0; // Time since new bullet spawned
-  // },
-
-  // Updates the position of the bullet each cycle
-  update: function (time, delta) {
-    this.x += this.xSpeed * delta;
-    this.y += this.ySpeed * delta;
-    this.born += delta;
-    if (this.born > 1800) {
-      this.setActive(false);
-      this.setVisible(false);
+    if (!directionalBlock) {
+      if (left) {
+        this.body.setVelocityX(this.body.velocity.x - accelerationSpeed);
+        this.anims.play("left", true);
+      }
+      if (right) {
+        this.body.setVelocityX(this.body.velocity.x + accelerationSpeed);
+        this.anims.play("right", true);
+      }
+      if (up) {
+        this.body.setVelocityY(this.body.velocity.y - accelerationSpeed);
+        this.anims.play("turn", true);
+      }
+      if (down) {
+        this.body.setVelocityY(this.body.velocity.y + accelerationSpeed);
+        this.anims.play("turn", true);
+      }
+      if (this.body.velocity.length() > maxVelocity) {
+        this.body.velocity.normalize().scale(maxVelocity);
+      }
     }
-  },
-});
+    if (nothingHappens || directionalBlock) {
+      this.anims.play("turn");
+    }
+  };
+}
 
-export default Bullet;
+export default Player;
