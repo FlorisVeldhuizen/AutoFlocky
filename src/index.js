@@ -6,6 +6,7 @@ import bombImg from "./assets/bomb.png";
 import dudeImg from "./assets/dude.png";
 import bulletImg from "./assets/bullet.png";
 import diamondImg from "./assets/diamond.png"
+import flockyImg from "./assets/flocky.png";
 import "./index.css";
 
 // Tutorial:
@@ -46,6 +47,7 @@ function preload() {
   this.load.image("diamond", diamondImg);
   this.load.image("bullet", bulletImg, 10, 10);
   this.load.spritesheet("dude", dudeImg, { frameWidth: 32, frameHeight: 48 });
+  this.load.image("flocky", flockyImg);
 }
 
 let platforms;
@@ -111,7 +113,7 @@ function create() {
 
   // STARS
   stars = this.physics.add.group({
-    key: "star",
+    key: "flocky",
     repeat: 30,
     setXY: { x: 0, y: 12, stepX: 28 },
   });
@@ -265,12 +267,23 @@ function shoot(physics) {
   }
 }
 
+function animateFlockys() {
+  stars.children.iterate(function (child) {
+    if (child.body.position.x > player.x) {
+      child.setFlipX(false);
+    } else {
+      child.setFlipX(true);
+    }
+  });
+}
+
 function update() {
   cursors.left.isDown || wasd.left.isDown ? (left = true) : (left = false);
   cursors.right.isDown || wasd.right.isDown ? (right = true) : (right = false);
   cursors.up.isDown || wasd.up.isDown ? (up = true) : (up = false);
   cursors.down.isDown || wasd.down.isDown ? (down = true) : (down = false);
   movement();
+  animateFlockys();
 
   enemyFollows(this.physics);
 }
