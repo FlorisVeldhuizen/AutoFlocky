@@ -1,6 +1,7 @@
 import Phaser from "phaser";
 import makeAnimations from "./helpers/animations";
 import Bullet from "./sprites/Bullet";
+import Player from "./sprites/Player";
 import "./index.css";
 
 // IMAGE IMPORT
@@ -68,10 +69,6 @@ let down;
 let left;
 let right;
 
-// CONSTANTS
-const accelerationSpeed = 75;
-const maxVelocity = 200;
-
 function create() {
   // BACKGROUND
   this.add.image(0, 0, "sky").setOrigin(0);
@@ -85,15 +82,10 @@ function create() {
   platforms.create(750, 220, "ground");
 
   //SCENE
-  scene = this.scene.scene;
+  scene = this;
 
   // PLAYER
-  player = this.physics.add.sprite(400, 300, "dude");
-  player.setBounce(0.1);
-  player.setDamping(true);
-  player.setDrag(0.01);
-  player.setMaxVelocity(maxVelocity);
-  player.setCollideWorldBounds(true);
+  player = new Player(this);
 
   makeAnimations(this);
 
@@ -207,36 +199,6 @@ function enemyFollows(physics) {
   });
 }
 
-const movement = () => {
-  const nothingHappens = !(left || right || up || down);
-  const directionalBlock = (left && right) || (down && up);
-
-  if (!directionalBlock) {
-    if (left) {
-      player.setVelocityX(player.body.velocity.x - accelerationSpeed);
-      player.anims.play("left", true);
-    }
-    if (right) {
-      player.setVelocityX(player.body.velocity.x + accelerationSpeed);
-      player.anims.play("right", true);
-    }
-    if (up) {
-      player.setVelocityY(player.body.velocity.y - accelerationSpeed);
-      player.anims.play("turn", true);
-    }
-    if (down) {
-      player.setVelocityY(player.body.velocity.y + accelerationSpeed);
-      player.anims.play("turn", true);
-    }
-    if (player.body.velocity.length() > maxVelocity) {
-      player.body.velocity.normalize().scale(maxVelocity);
-    }
-  }
-  if (nothingHappens || directionalBlock) {
-    player.anims.play("turn");
-  }
-};
-
 function shoot(physics) {
   if (playerBullets.countActive(true) === 0) {
     // Get bullet from bullets group
@@ -263,7 +225,8 @@ function update() {
   cursors.right.isDown || wasd.right.isDown ? (right = true) : (right = false);
   cursors.up.isDown || wasd.up.isDown ? (up = true) : (up = false);
   cursors.down.isDown || wasd.down.isDown ? (down = true) : (down = false);
-  movement();
+
+  player.update(left,right, up, down);
   animateFlockys();
 
   enemyFollows(this.physics);
