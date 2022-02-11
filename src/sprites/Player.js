@@ -7,6 +7,8 @@ const maxVelocity = 200;
 class Player extends Phaser.GameObjects.Sprite {
   constructor(scene, x, y) {
     super(scene, x, y, "dude");
+    this.scene = scene;
+    this.alive = true;
 
     this.scene.add.existing(this);
     this.scene.physics.add.existing(this);
@@ -18,7 +20,7 @@ class Player extends Phaser.GameObjects.Sprite {
     this.body.setDrag(0.01);
     this.body.setMaxVelocity(maxVelocity);
     this.body.setCollideWorldBounds(true);
-    this.hp = new Healthbar(scene, this.body, -24, -10);
+    this.hp = new Healthbar(scene, this.body, 100, -24, -10);
   }
 
   update({ left, right, up, down }) {
@@ -51,6 +53,16 @@ class Player extends Phaser.GameObjects.Sprite {
     }
     this.hp.update();
   };
+
+  damage (amount) {
+    this.scene.flashColor(this, 0xff0000);
+    if (this.hp.decrease(amount)) {
+      this.alive = false;
+      this.scene.physics.pause();
+      this.anims.play("turn");
+      this.scene.scene.start("endScene");
+    }
+  }
 }
 
 export function collectDiamond(player, diamond) {
