@@ -1,11 +1,12 @@
 import Phaser from "phaser";
+import Healthbar from "./Healthbar";
 
 // CONSTANTS
 const accelerationSpeed = 75;
 const maxVelocity = 200;
 class Player extends Phaser.GameObjects.Sprite {
-  constructor(scene) {
-    super(scene, 300, 400, "dude");
+  constructor(scene, x, y) {
+    super(scene, x, y, "dude");
 
     this.scene.add.existing(this);
     this.scene.physics.add.existing(this);
@@ -17,7 +18,9 @@ class Player extends Phaser.GameObjects.Sprite {
     this.body.setDrag(0.01);
     this.body.setMaxVelocity(maxVelocity);
     this.body.setCollideWorldBounds(true);
+    this.hp = new Healthbar(scene, this.body, -24, -10);
   }
+
   update({ left, right, up, down }) {
     const nothingHappens = !(left || right || up || down);
     const directionalBlock = (left && right) || (down && up);
@@ -46,7 +49,14 @@ class Player extends Phaser.GameObjects.Sprite {
     if (nothingHappens || directionalBlock) {
       this.anims.play("turn");
     }
+    this.hp.update();
   };
+}
+
+export function collectDiamond(player, diamond) {
+  diamond.disableBody(true, true);
+  this.score += 50;
+  this.scoreText.setText("Score: " + this.score);
 }
 
 export default Player;

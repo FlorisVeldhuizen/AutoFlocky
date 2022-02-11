@@ -28,6 +28,7 @@ class GameScene extends Phaser.Scene {
     this.bombs;
     this.diamonds;
     this.playerBullets;
+    this.enemySpeed = 70;
 
     this.keys = {
       up: false,
@@ -57,7 +58,6 @@ class GameScene extends Phaser.Scene {
     // this.platforms
     this.platforms = this.physics.add.staticGroup();
     this.platforms.create(400, 568, "ground").setScale(2).refreshBody();
-
     this.platforms.create(600, 400, "ground");
     this.platforms.create(50, 250, "ground");
     this.platforms.create(750, 220, "ground");
@@ -66,7 +66,7 @@ class GameScene extends Phaser.Scene {
     this.scene = this;
 
     // PLAYER
-    this.player = new Player(this);
+    this.player = new Player(this, 300, 400);
 
     makeAnimations(this);
 
@@ -125,7 +125,7 @@ class GameScene extends Phaser.Scene {
     this.physics.add.overlap(
       this.enemies,
       this.playerBullets,
-      this.starHitCallback,
+      this.enemyHitCallback,
       null,
       this
     );
@@ -207,7 +207,7 @@ class GameScene extends Phaser.Scene {
   }
 
   collectDiamond(player, diamond) {
-    diamond.disableBody(true, true);
+    diamond.destroy();
     this.score += 50;
     this.scoreText.setText("Score: " + this.score);
   }
@@ -222,20 +222,21 @@ class GameScene extends Phaser.Scene {
   }
 
   enemyFollows() {
-    this.enemies.children.each((star) => {
-      this.physics.moveToObject(star, this.player, 100);
+    this.enemies.children.each((enemy) => {
+      this.physics.moveToObject(enemy, this.player, this.enemySpeed);
     });
   }
 
   shoot() {
     if (this.playerBullets.countActive(true) === 0) {
       // Get bullet from bullets group
-      var bullet = this.playerBullets.get().setActive(true).setVisible(true);
-      if (bullet) {
+      const bullet = this.playerBullets.get().setActive(true).setVisible(true);
+      const enemies =  this.enemies.children;
+      if (bullet && enemies.entries.length > 0) {
         const player = this.player;
         let closestEnemy;
         let closestEnemyDist = 10000;
-        this.enemies.children.iterate(function (child) {
+        enemies.iterate(function (child) {
           const dist = Phaser.Math.Distance.BetweenPoints(player, child);
           if (dist < closestEnemyDist) {
             closestEnemyDist = dist;
@@ -258,7 +259,7 @@ class GameScene extends Phaser.Scene {
     });
   }
 
-  starHitCallback(enemyHit, bulletHit) {
+  enemyHitCallback(enemyHit, bulletHit) {
     // Reduce health of enemy
     if (bulletHit.active === true && enemyHit.active === true) {
       enemyHit.health = enemyHit.health - 1;
@@ -266,7 +267,7 @@ class GameScene extends Phaser.Scene {
       if (enemyHit.health <= 0) {
         const { x, y } = enemyHit;
         this.diamonds.create(x, y, "diamond");
-        enemyHit.setActive(false).setVisible(false);
+        enemyHit.destroy();
       }
     }
   }
