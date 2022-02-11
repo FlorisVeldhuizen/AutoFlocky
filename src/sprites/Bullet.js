@@ -1,6 +1,5 @@
 import Phaser from "phaser";
 
-
 const Bullet = new Phaser.Class({
   Extends: Phaser.GameObjects.Sprite,
 
@@ -13,7 +12,7 @@ const Bullet = new Phaser.Class({
       this.direction = 0;
       this.xSpeed = 0;
       this.ySpeed = 0;
-      this.setScale(.5);
+      this.setScale(0.5);
     },
 
   // Fires a bullet from the player to the reticle
@@ -30,7 +29,7 @@ const Bullet = new Phaser.Class({
       this.ySpeed = -this.speed * Math.cos(this.direction);
     }
 
-    this.rotation = shooter.rotation; // angle bullet with shooters rotation
+    this.rotation = this.direction; //shooter.rotation; // angle bullet with shooters rotation
     this.born = 0; // Time since new bullet spawned
   },
 

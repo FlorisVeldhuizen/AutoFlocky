@@ -89,7 +89,7 @@ class GameScene extends Phaser.Scene {
     this.physics.add.overlap(
       this.player,
       this.enemies,
-      this.collectStar,
+      this.collectEnemy,
       null,
       this
     );
@@ -176,11 +176,14 @@ class GameScene extends Phaser.Scene {
   }
 
   //CUSTOM FUNCTIONS
-  collectStar(player, star) {
-    star.disableBody(true, true);
+  collectEnemy(player, enemy) {
+    enemy.disableBody(true, true);
+    // enemy.destroy();
 
     this.score += 10;
     this.scoreText.setText("Score: " + this.score);
+
+    console.log(this.enemies);
 
     if (this.enemies.countActive(true) === 0) {
       this.enemies.children.iterate(function (child) {
@@ -231,7 +234,7 @@ class GameScene extends Phaser.Scene {
     if (this.playerBullets.countActive(true) === 0) {
       // Get bullet from bullets group
       const bullet = this.playerBullets.get().setActive(true).setVisible(true);
-      const enemies =  this.enemies.children;
+      const enemies = this.enemies.children;
       if (bullet && enemies.entries.length > 0) {
         const player = this.player;
         let closestEnemy;
