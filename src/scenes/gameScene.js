@@ -89,7 +89,7 @@ class GameScene extends Phaser.Scene {
     this.physics.add.overlap(
       this.player,
       this.enemies,
-      this.collectEnemy,
+      this.touchEnemy,
       null,
       this
     );
@@ -176,9 +176,10 @@ class GameScene extends Phaser.Scene {
   }
 
   //CUSTOM FUNCTIONS
-  collectEnemy(player, enemy) {
-    enemy.disableBody(true, true);
-    // enemy.destroy();
+  touchEnemy(player, star) {
+    star.disableBody(true, true);
+    // for now: 2 damage per hit
+    player.damage(2);
 
     this.score += 10;
     this.scoreText.setText("Score: " + this.score);

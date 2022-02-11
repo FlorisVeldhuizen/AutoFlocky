@@ -1,6 +1,6 @@
 class Healthbar {
 
-  constructor (scene, body, offsetX, offsetY)
+  constructor (scene, body, maxHP, offsetX, offsetY)
   {
       this.bar = new Phaser.GameObjects.Graphics(scene);
       this.body = body;
@@ -8,7 +8,7 @@ class Healthbar {
       this.y = body.y;
       this.offsetX = offsetX;
       this.offsetY = offsetY;
-      this.value = 100;
+      this.value = maxHP;
       this.p = 76 / 100;
 
       this.draw();
