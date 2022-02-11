@@ -18,7 +18,7 @@ class GameScene extends Phaser.Scene {
     super({ key: "gameScene" });
 
     this.platforms;
-    this.scene;
+    // this.scene;
     this.score = 0;
     this.scoreText;
     this.player;
@@ -33,8 +33,8 @@ class GameScene extends Phaser.Scene {
       up: false,
       down: false,
       left: false,
-      right: false
-    }
+      right: false,
+    };
   }
 
   init() {}
@@ -61,9 +61,6 @@ class GameScene extends Phaser.Scene {
     this.platforms.create(600, 400, "ground");
     this.platforms.create(50, 250, "ground");
     this.platforms.create(750, 220, "ground");
-
-    //SCENE
-    this.scene = this;
 
     // PLAYER
     this.player = new Player(this);
@@ -133,11 +130,11 @@ class GameScene extends Phaser.Scene {
     this.physics.add.collider(this.playerBullets, this.platforms);
 
     // AUTO SHOOT
-    this.scene.time.addEvent({
+    this.time.addEvent({
       delay: 500,
       callback: this.shoot,
       args: [],
-      callbackScope: this.scene,
+      callbackScope: this,
       loop: true,
     });
 
@@ -174,7 +171,9 @@ class GameScene extends Phaser.Scene {
     this.enemyFollows(this.physics);
   }
 
-  end() {}
+  end() {
+    console.log("Halloo");
+  }
 
   //CUSTOM FUNCTIONS
   collectStar(player, star) {
@@ -218,7 +217,8 @@ class GameScene extends Phaser.Scene {
     this.player.setTint(0xff0000);
     this.player.anims.play("turn");
 
-    gameOver = true;
+    // this.scene.stop();
+    this.scene.start("endScene");
   }
 
   enemyFollows() {
@@ -273,7 +273,7 @@ class GameScene extends Phaser.Scene {
 
   flashColor(object, color) {
     object.setTint(color);
-    this.scene.time.addEvent({
+    this.time.addEvent({
       delay: 100,
       callback: function () {
         object.clearTint();

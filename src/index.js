@@ -1,4 +1,5 @@
 import Phaser from "phaser";
+import EndScene from "./scenes/endScene";
 import TitleScene from "./scenes/titleScene";
 import GameScene from "./scenes/gameScene";
 import "./index.css";
@@ -6,6 +7,7 @@ import "./index.css";
 // Our game scene
 const gameScene = new GameScene();
 const titleScene = new TitleScene();
+const endScene = new EndScene();
 
 const config = {
   type: Phaser.AUTO,
@@ -22,12 +24,15 @@ const config = {
     target: 60,
     forceSetTimeOut: true,
   },
+  scene: [titleScene, gameScene, endScene],
 };
 
 const game = new Phaser.Game(config);
-// load scenes
-game.scene.add("titleScene", titleScene);
-game.scene.add("game", gameScene);
+
+// // load scenes
+// game.scene.add("titleScene", titleScene);
+// game.scene.add("endScene", endScene);
+// game.scene.add("game", gameScene);
 
 // start title
 game.scene.start("titleScene");
