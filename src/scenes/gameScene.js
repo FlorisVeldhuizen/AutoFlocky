@@ -4,7 +4,7 @@ import Bullet from "../sprites/Bullet";
 import Player from "../sprites/Player";
 
 // IMPORT ASSETS
-import skyImg from "../assets/sky.png";
+import worldImg from "../assets/world.png";
 import starImg from "../assets/star.png";
 import platformImg from "../assets/platform.png";
 import bombImg from "../assets/bomb.png";
@@ -41,7 +41,7 @@ class GameScene extends Phaser.Scene {
   init() {}
 
   preload() {
-    this.load.image("sky", skyImg);
+    this.load.image("world", worldImg);
     this.load.image("ground", platformImg);
     this.load.image("star", starImg);
     this.load.image("bomb", bombImg);
@@ -53,7 +53,7 @@ class GameScene extends Phaser.Scene {
 
   create() {
     // BACKGROUND
-    this.add.image(0, 0, "sky").setOrigin(0);
+    this.add.image(0, 0, "world").setOrigin(0);
 
     // this.platforms
     this.platforms = this.physics.add.staticGroup();
@@ -177,7 +177,7 @@ class GameScene extends Phaser.Scene {
 
   //CUSTOM FUNCTIONS
   touchEnemy(player, star) {
-    star.disableBody(true, true);
+    // star.disableBody(true, true);
     // for now: 2 damage per hit
     player.damage(2);
 

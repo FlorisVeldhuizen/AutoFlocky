@@ -19,7 +19,7 @@ class Player extends Phaser.GameObjects.Sprite {
     this.body.setDamping(true);
     this.body.setDrag(0.01);
     this.body.setMaxVelocity(maxVelocity);
-    this.body.setCollideWorldBounds(true);
+    // this.body.setCollideWorldBounds(true);
     this.hp = new Healthbar(scene, this.body, 100, -24, -10);
   }
 
@@ -52,9 +52,9 @@ class Player extends Phaser.GameObjects.Sprite {
       this.anims.play("turn");
     }
     this.hp.update();
-  };
+  }
 
-  damage (amount) {
+  damage(amount) {
     this.scene.flashColor(this, 0xff0000);
     if (this.hp.decrease(amount)) {
       this.alive = false;
